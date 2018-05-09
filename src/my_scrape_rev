@@ -1,0 +1,111 @@
+from selenium.webdriver import Chrome
+from bs4 import BeautifulSoup
+# import pandas as pd
+import pymongo
+import datetime
+# import sys
+# from urllib.parse import urlparse
+# import random
+import time
+
+""" XXXXXXXXXXX
+
+"""
+
+def get_links(url):
+
+    parsed_url = urlparse(url)
+
+    # get domain
+    domain = "{}://{}".format(parsed_url.scheme, parsed_url.netloc)
+
+    # start selenium Chrome browser
+    browser = Chrome()
+    browser.get(url)
+
+    # download the html
+    html = browser.page_source
+    soup = BeautifulSoup(html, 'html.parser')
+
+    # select the table of contents
+    sel = "div#table_of_contents_chapters"
+    toc = soup.select_one(sel)
+
+    # select the links
+    link_sel = "a.turd"
+    links = toc.select(link_sel)
+
+    # return the list of links
+    return [domain + link.attrs['href'] for link in links if 'href' in link.attrs]
+
+def get_song_urls(artist_url):
+    '''get urls to song pages'''
+    browser.get(artist_url)
+    time.sleep(2)
+    song_block = soup.select('article.YMhU9 a')
+    song_urls = [s.attrs.get('href') for s in song_block]
+    return song_urls
+
+def scrape_song_page(song_url):
+    '''get raw song html from page'''
+    browser.get(song_url)
+    time.sleep(5)
+    song_html = browser.page_source
+    return song_html
+
+def parse_chapter(url):
+    browser.get(url)
+    html = browser.page_source
+
+    # use bs4 to parse the html
+    soup = BeautifulSoup(html, 'html.parser')
+
+    sel_cc = "div#code_content"
+    code_content = soup.select_one(sel_cc)
+
+    sel_div = "div.section_body"
+    code_sections = code_content.select(sel_div)
+
+    title_sel = "a.section_title"
+    text_sel = "div.ordinary_text"
+
+    return [parse_section(sec, title_sel, text_sel, html) for sec in code_sections]
+
+
+def parse_section(sec, title_sel, text_sel, html):
+    title = sec.select_one(title_sel).text
+    code = sec.select_one(text_sel).text
+    section_dict = {
+        'title': title,
+        'code': code,
+        'date_read': datetime.datetime.now()
+        'html': html
+    }
+    return section_dict
+
+
+if __name__ == "__main__":
+
+    # start mongodb and create db to store the html
+    mc = pymongo.MongoClient()
+    db = mc[sys.argv[2]]
+
+    # set up selenium to get the html from the url
+    url = sys.argv[1]
+    browser = Chrome()
+    browser.get(url)
+
+    XXchapter_links = get_links(url)
+    song_urls =  get_song_urls(artist_url)
+
+    for link in chapter_links:
+        parsed_sections = parse_chapter(link)
+
+        table_name = "".join(link.split('/')[6:8])
+
+        ch = db[table_name]
+
+        for sec in parsed_sections:
+            ch.insert_one(sec)
+
+        time.sleep(random.randint(15,60))
