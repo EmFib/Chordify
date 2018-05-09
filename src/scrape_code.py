@@ -1,3 +1,9 @@
+from selenium.webdriver import Chrome
+from bs4 import BeautifulSoup
+import pymongo
+import datetime
+import time 
+
 browser = Chrome()
 
 db = mc['chordify']
