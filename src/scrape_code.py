@@ -1,5 +1,8 @@
 browser = Chrome()
 
+db = mc['chordify']
+raw_html = db['raw_html']
+
 def make_urls(n):
     '''get list of page urls for given artist'''
     artist_urls = []
