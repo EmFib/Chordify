@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import pymongo
 import datetime
 import time
+import random
 
 mc = pymongo.MongoClient()
 
@@ -11,7 +12,7 @@ browser = Chrome()
 html = browser.page_source
 soup = BeautifulSoup(html, 'html.parser')
 
-def make_urls(base_url, n=12):
+def make_urls(base_url, n=9):
     '''get list of page urls for given artist'''
     artist_urls = []
     for num in range(n+1):
@@ -66,3 +67,5 @@ if __name__ == "__main__":
              'datetime': datetime.datetime.now(),
              'html': html
             })
+
+        time.sleep(random.randint(15,60))
