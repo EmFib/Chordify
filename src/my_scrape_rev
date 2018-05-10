@@ -71,10 +71,14 @@ if __name__ == "__main__":
     db = mc['chordify']
     raw_html = db['raw_html']
 
+    artist_urls = make_urls(base_url, n=12)
+    song_urls = get_all_urls(artist_urls)
+
     url = song_url
     browser = Chrome()
     browser.get(url)
 
+    artist_urls = make_urls(base_url, n=12)
     song_urls = get_song_urls(artist_url)
 
     for song_url in song_urls:
@@ -85,4 +89,4 @@ if __name__ == "__main__":
              'html': html
             })
 
-        time.sleep(random.randint(15,60))
+    time.sleep(random.randint(15,60))
