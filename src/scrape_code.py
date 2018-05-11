@@ -13,13 +13,13 @@ raw_html = db['raw_html']
 browser = Chrome()
 
 
-base_url = 'https://www.ultimate-guitar.com/artist/paul_simon_11328?filter=chords&page='
+base_url = 'https://www.ultimate-guitar.com/artist/tom_petty_9673?filter=chords&page='
 
 
-def make_urls(base_url, n=4):
+def make_urls(base_url, n=3):
     '''get list of page urls for given artist'''
     artist_urls = []
-    for num in range(n+1):
+    for num in range(1, n+1):
         artist_urls.append(base_url + str(num))
     return artist_urls
 
@@ -42,16 +42,25 @@ def get_song_urls(artist_url):
     return song_urls
 
 
-def scrape_song_page(song_url):
+def scrape_song_page(song_url, retrieve_from_cache=True):
     '''get raw song html from page'''
+    if retrieve_from_cache:
+        result = retrieve_song(song_url)
+        if result:
+            if 'html' in result:
+                return result['html']
+            if 'song_html' in result:
+                return result['song_html']
     browser.get(song_url)
     time.sleep(5)
     html = browser.page_source
     return html
 
-## ADD retrieve song function
-# if result none, go to url
-# else continue
+
+def retrieve_song(song_url):
+    result = raw_html.find_one({'url': song_url})
+    return result
+
 
 def scrape_songs(song_urls):
     '''scrape each song link into MongoDB'''
@@ -59,11 +68,12 @@ def scrape_songs(song_urls):
     for song_url in song_urls:
         print (song_url)
         html = scrape_song_page(song_url)
-        raw_html.insert_one (
-            {'url': song_url,
-             'datetime': datetime.datetime.now(),
-             'html': html
-            })
+        if retrieve_song(song_url) is None:
+            raw_html.insert_one (
+                {'url': song_url,
+                 'datetime': datetime.datetime.now(),
+                 'html': html
+                })
 
 
 def main():

@@ -115,4 +115,4 @@ def parse_many(some_docs):
     for some_doc in some_docs:
         parsed_song = parse_song(some_doc)
         parsed_songs.append(parsed_song)
-    return parsed_songs 
+    return parsed_songs
