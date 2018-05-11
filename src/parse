@@ -19,8 +19,8 @@ def get_lines_from_song(html_doc):
     html = html_doc['html']
     soup = BeautifulSoup(html, 'html.parser')
     song_body = soup.select_one('pre._1YgOS')
-    lines = str(song_body).split('\n')
-    return lines
+    song_lines = str(song_body).split('\n')
+    return song_lines
 
 
 def strip_html(text):
@@ -36,21 +36,21 @@ def strip_html(text):
     return ''.join(result)
 
 
-def parse_lines(html_doc):
-    lines = get_lines_from_song(html_doc)
-    parsed_lines = []
-    for i, line in enumerate(lines):
-        if '_3L0Da' in line:
-            parsed_lines.append({'chords': strip_html(line)})
-        elif (('_3L0Da' in lines[i-1]) and (line == line) and (strip_html(line) == line)):
-            parsed_lines[-1]['words'] = line
-    return parsed_lines
+def separate_lines(html_doc):
+    song_lines = get_lines_from_song(html_doc)
+    lines = []
+    for i, song_line in enumerate(song_lines):
+        if '_3L0Da' in song_line:
+            lines.append({'chords': strip_html(song_line)})
+        elif (('_3L0Da' in song_lines[i-1]) and (song_line == song_line) and (strip_html(song_line) == song_line)):
+            lines[-1]['words'] = song_line
+    return lines
 
 
-def get_chords(parsed_line):
+def get_chords(line):
     chord_idxs = []
     chords = []
-    c_string = parsed_line['chords']
+    c_string = line['chords']
     for chord in re.finditer('\w+', c_string):
         chord_idxs.append(chord.start())
         chords.append(chord.group())
@@ -58,11 +58,11 @@ def get_chords(parsed_line):
     return chord_idxs, chords, chord_tups
 
 
-def get_words(parsed_line):
+def get_words(line):
     word_idxs = []
     words = []
-    if 'words'in parsed_line:
-        w_string = parsed_line['words']
+    if 'words'in line:
+        w_string = line['words']
         for word in re.finditer('\w+', w_string):
             word_idxs.append(word.start())
             words.append(word.group())
@@ -70,10 +70,10 @@ def get_words(parsed_line):
     return word_idxs, words, word_tups
 
 
-def merge_chord_word(parsed_line):
-    chord_tups = get_chords(parsed_line)[2]
-    word_tups = get_words(parsed_line)[2]
-    word_list = get_words(parsed_line)[1]
+def merge_chord_word(line):
+    chord_tups = get_chords(line)[2]
+    word_tups = get_words(line)[2]
+    word_list = get_words(line)[1]
     chord_idx_list = []
     for chord_tup in chord_tups:
         for i, word_tup in enumerate(word_tups):
@@ -88,17 +88,31 @@ def combine_ch_wd_lists(merged_line_1, merged_line_2):
     chord_idx_list_2, word_list_2 = merged_line_2
     new_chord_tups = []
     for chord_idx_tup in chord_idx_list_2:
-        new_chord_tups.append( ( ((chord_idx_tup)[0]+len(word_list_1)), chord_idx_tup[1] ) )
+        new_chord_tups.append( ( ( (chord_idx_tup)[0] + len(word_list_1) ), chord_idx_tup[1] ) )
     all_chords_tups = chord_idx_list_1 + new_chord_tups
     all_words_list = word_list_1 + word_list_2
     return all_chords_tups, all_words_list
 
 
-def parse_song(parsed_lines):
-    for i, parsed_line in enumerate(parsed_lines):
+def parse_lines(lines):
+    for i, line in enumerate(lines):
         if i == 0:
-            merged_line = merge_chord_word(parsed_line)
+            parsed_line = merge_chord_word(line)
         else:
-            merged_line_next = merge_chord_word(parsed_line)
-            merged_line = combine_ch_wd_lists(merged_line, merged_line_next)
-    return merged_line
+            parsed_line_next = merge_chord_word(line)
+            parsed_line = combine_ch_wd_lists(parsed_line, parsed_line_next)
+    return parsed_line
+
+
+def parse_song(html_doc):
+    lines = separate_lines(html_doc)
+    parsed_song = parse_lines(lines)
+    return parsed_song
+
+
+def parse_many(some_docs):
+    parsed_songs = []
+    for some_doc in some_docs:
+        parsed_song = parse_song(some_doc)
+        parsed_songs.append(parsed_song)
+    return parsed_songs 
