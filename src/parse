@@ -1,4 +1,4 @@
-from selenium.webdriver import Chrome
+# from selenium.webdriver import Chrome
 from bs4 import BeautifulSoup
 import pymongo
 import datetime
@@ -15,21 +15,34 @@ raw_html = db['raw_html']
 html_docs = list(raw_html.find())
 
 
-def get_lines_from_songs(html_docs):
-    for doc in html_docs:
-        html = doc['html']
-        soup = BeautifulSoup(html, 'html.parser')
-        song_body = soup.select_one('pre._1YgOS')
-        lines = str(song_body).split('\n')
-        return lines
+def get_lines_from_song(html_doc):
+    html = html_doc['html']
+    soup = BeautifulSoup(html, 'html.parser')
+    song_body = soup.select_one('pre._1YgOS')
+    lines = str(song_body).split('\n')
+    return lines
 
 
-def parse_lines(lines):
+def strip_html(text):
+    result = []
+    in_tag = False
+    for char in text:
+        if char == '<':
+            in_tag = True
+        if not in_tag:
+            result.append(char)
+        if char == '>':
+            in_tag = False
+    return ''.join(result)
+
+
+def parse_lines(html_doc):
+    lines = get_lines_from_song(html_doc)
     parsed_lines = []
-    for line in lines:
+    for i, line in enumerate(lines):
         if '_3L0Da' in line:
             parsed_lines.append({'chords': strip_html(line)})
-        elif line and strip_html(line) == line:
+        elif (('_3L0Da' in lines[i-1]) and (line == line) and (strip_html(line) == line)):
             parsed_lines[-1]['words'] = line
     return parsed_lines
 
@@ -48,43 +61,44 @@ def get_chords(parsed_line):
 def get_words(parsed_line):
     word_idxs = []
     words = []
-    w_string = parsed_line['words']
-    for word in re.finditer('\w+', w_string):
-        word_idxs.append(word.start())
-        words.append(word.group())
+    if 'words'in parsed_line:
+        w_string = parsed_line['words']
+        for word in re.finditer('\w+', w_string):
+            word_idxs.append(word.start())
+            words.append(word.group())
     word_tups = list(zip(word_idxs, words))
     return word_idxs, words, word_tups
 
 
-def match_ch_wd(parsed_line):
-    word_tups = get_words(parsed_line)[2]
+def merge_chord_word(parsed_line):
     chord_tups = get_chords(parsed_line)[2]
+    word_tups = get_words(parsed_line)[2]
     word_list = get_words(parsed_line)[1]
-    word_chord_idx_list = []
-    for ch_tup in chord_tups:
-        for i, wd_tup in enumerate(word_tups):
-            if wd_tup[0] > ch_tup[0]:
-                word_chord_idx_list.append((i-1, ch_tup[1]))
+    chord_idx_list = []
+    for chord_tup in chord_tups:
+        for i, word_tup in enumerate(word_tups):
+            if word_tup[0] > chord_tup[0]:
+                chord_idx_list.append((i-1, chord_tup[1]))
                 break
-    return (word_chord_idx_list, word_list)
+    return (chord_idx_list, word_list)
 
 
-def combine_ch_wd_list(parsed_line_0, parsed_line_1):
-    ch_tups_0, wd_list_0 = match_ch_wd(parsed_line_0)
-    ch_tups_1, wd_list_1 = match_ch_wd(parsed_line_1)
-    new_tups = []
-#     combo_lists = []
-    for ch_tup_1 in ch_tups_1:
-        new_tups.append( ( ((ch_tup_1)[0]+len(wd_list_0)), ch_tup_1[1] ) )
-    combo_tups = ch_tups_0 + new_tups
-    combo_lists = wd_list_0 + wd_list_1
-    return combo_tups, combo_lists
+def combine_ch_wd_lists(merged_line_1, merged_line_2):
+    chord_idx_list_1, word_list_1 = merged_line_1
+    chord_idx_list_2, word_list_2 = merged_line_2
+    new_chord_tups = []
+    for chord_idx_tup in chord_idx_list_2:
+        new_chord_tups.append( ( ((chord_idx_tup)[0]+len(word_list_1)), chord_idx_tup[1] ) )
+    all_chords_tups = chord_idx_list_1 + new_chord_tups
+    all_words_list = word_list_1 + word_list_2
+    return all_chords_tups, all_words_list
+
 
 def parse_song(parsed_lines):
     for i, parsed_line in enumerate(parsed_lines):
-        get_chords(parsed_line)
-        get_words(parsed_line)
-        match_ch_wd(parsed_line)
-        if i < (len(parsed_lines) - 1):
-            song_wc_idx_list, song_word_list = combine_ch_wd_list(parsed_lines[i], parsed_lines[i+1])
-    return song_wc_idx_list, song_word_list
+        if i == 0:
+            merged_line = merge_chord_word(parsed_line)
+        else:
+            merged_line_next = merge_chord_word(parsed_line)
+            merged_line = combine_ch_wd_lists(merged_line, merged_line_next)
+    return merged_line
