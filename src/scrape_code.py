@@ -5,12 +5,16 @@ import datetime
 import time
 import random
 
+
 mc = pymongo.MongoClient()
+db = mc['chordify']
+raw_html = db['raw_html']
 
 browser = Chrome()
 
-html = browser.page_source
-soup = BeautifulSoup(html, 'html.parser')
+
+base_url = 'https://www.ultimate-guitar.com/artist/bob_dylan_10212?filter=chords&page='
+
 
 def make_urls(base_url, n=9):
     '''get list of page urls for given artist'''
@@ -23,14 +27,16 @@ def make_urls(base_url, n=9):
 def get_all_urls(artist_urls):
     '''iterate through n pages for artist'''
     for artist_url in artist_urls:
-        song_urls = get_song_urls(artist_url)
-    return song_urls
+        yield from(get_song_urls(artist_url))
 
 
 def get_song_urls(artist_url):
     '''get urls to song pages'''
+    print (artist_url)
     browser.get(artist_url)
-    time.sleep(2)
+    time.sleep(5)
+    html = browser.page_source
+    soup = BeautifulSoup(html, 'html.parser')
     song_block = soup.select('article.YMhU9 a')
     song_urls = [s.attrs.get('href') for s in song_block]
     return song_urls
@@ -43,29 +49,28 @@ def scrape_song_page(song_url):
     html = browser.page_source
     return html
 
+## ADD retrieve song function
+# if result none, go to url
+# else continue
 
 def scrape_songs(song_urls):
     '''scrape each song link into MongoDB'''
 
-
-if __name__ == "__main__":
-
-
-    mc = pymongo.MongoClient()
-    db = mc['chordify']
-    raw_html = db['raw_html']
-
-    base_url = 'https://www.ultimate-guitar.com/artist/bob_dylan_10212?filter=chords&page='
-    artist_urls = make_urls(base_url, n=12)
-    song_urls = get_all_urls(artist_urls)
-
     for song_url in song_urls:
+        print (song_url)
         html = scrape_song_page(song_url)
-        print (html)
         raw_html.insert_one (
-            {'url': url,
+            {'url': song_url,
              'datetime': datetime.datetime.now(),
              'html': html
             })
 
-        time.sleep(random.randint(15,60))
+
+def main():
+    artist_urls = make_urls(base_url, n=9)
+    song_urls = get_all_urls(artist_urls)
+    scrape_songs(song_urls)
+
+
+if __name__ == "__main__":
+    main()
