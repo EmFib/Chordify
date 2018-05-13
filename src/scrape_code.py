@@ -13,7 +13,7 @@ raw_html = db['raw_html']
 browser = Chrome()
 
 
-base_url = 'https://www.ultimate-guitar.com/artist/tom_waits_11551?filter=chords&page='
+base_url = 'https://www.ultimate-guitar.com/artist/waylon_jennings_10599?filter=chords&page='
 
 
 def make_urls(base_url, n=4):
