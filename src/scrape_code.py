@@ -13,10 +13,10 @@ raw_html = db['raw_html']
 browser = Chrome()
 
 
-base_url = 'https://www.ultimate-guitar.com/artist/jimi_hendrix_8984?filter=chords&page='
+base_url = 'https://www.ultimate-guitar.com/artist/jack_white_19356?filter=chords&page='
 
 
-def make_urls(base_url, n=1):
+def make_urls(base_url, n=6):
     '''get list of page urls for given artist'''
     artist_urls = []
     for num in range(1, n+1):
@@ -77,7 +77,7 @@ def scrape_songs(song_urls):
 
 
 def main():
-    artist_urls = make_urls(base_url, n=9)
+    artist_urls = make_urls(base_url, n=2)
     song_urls = get_all_urls(artist_urls)
     scrape_songs(song_urls)
 
