@@ -13,7 +13,7 @@ raw_html = db['raw_html']
 browser = Chrome()
 
 
-base_url = "https://www.ultimate-guitar.com/explore?genres[]=4&part[]=&type[]=Chords&page="
+base_url = 'https://www.ultimate-guitar.com/explore?genres[]=4&order=hitstotal_desc&type[]=Chords&page='
 
 
 def make_urls(base_url, n=10):
