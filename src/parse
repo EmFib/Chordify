@@ -111,16 +111,18 @@ def parse_lines(lines):
             parsed_line = combine_ch_wd_lists(parsed_line, parsed_line_next)
     return parsed_line
 
+
 def parse_song(html_doc):
     lines = separate_lines(html_doc)
     parsed_song = parse_lines(lines)
     return parsed_song
 
-def parse_many(some_docs):
+
+def parse_many(html_docs):
     parsed_songs = []
-    for some_doc in some_docs:
+    for html_doc in html_docs:
         try:
-            parsed_song = parse_song(some_doc)
+            parsed_song = parse_song(html_doc)
             parsed_songs.append(parsed_song)
         except KeyError as e:
             warnings.warn(e.message)
@@ -129,3 +131,11 @@ def parse_many(some_docs):
             warnings.warn(str(e))
             continue
     return parsed_songs
+
+
+def main():
+    parse_many(html_docs)
+
+
+if __name__ == "__main__":
+    main()
