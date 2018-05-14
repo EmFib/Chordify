@@ -8,8 +8,9 @@ import re
 import warnings
 from sklearn.naive_bayes import BernoulliNB, MultinomialNB
 from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
 import string
-
+from parse import *
 
 mc = pymongo.MongoClient()
 db = mc['chordify']
@@ -17,6 +18,9 @@ raw_html = db['raw_html']
 
 
 html_docs = list(raw_html.find())
+
+
+parsed_songs = parse_many(html_docs)
 
 
 def get_all_lyrics_chords(song):
@@ -42,3 +46,19 @@ def make_song_mats(song_dict_list):
     for song_dict in song_dict_list:
         contains_minor.append(any('m' in chord for chord in song_dict['chords']))
         lyrics_list.append(song_dict['lyrics'])
+    return contains_minor, lyrics_list
+
+
+tfidf = TfidfVectorizer()
+logistic = LogisticRegression()
+
+
+tfidf.fit(lyrics_list_train)
+
+train_matrix = tfidf.transform(lyrics_list_train)
+
+logistic.fit(train_matrix, contains_minor_train)
+
+test_matrix = tfidf.transform(lyrics_list_test)
+
+logistic.predict_proba(test_matrix)
