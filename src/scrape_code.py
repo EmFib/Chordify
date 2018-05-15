@@ -13,8 +13,7 @@ raw_html = db['raw_html']
 browser = Chrome()
 
 
-base_url = "https://www.ultimate-guitar.com/explore?genres[]=4&part[]=&type[]=Chords&page="
-
+base_url = 'https://www.ultimate-guitar.com/explore?genres[]=49&order=hitstotal_desc&page=1&type[]=Chords&page='
 
 def make_urls(base_url, n=10):
     '''get list of page urls for given artist'''

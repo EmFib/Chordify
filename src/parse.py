@@ -8,14 +8,6 @@ import re
 import warnings
 
 
-mc = pymongo.MongoClient()
-db = mc['chordify']
-raw_html = db['raw_html']
-
-
-html_docs = list(raw_html.find())
-
-
 def get_lines_from_song(html_doc):
     if 'html' in html_doc:
         html = html_doc['html']
@@ -121,6 +113,7 @@ def parse_song(html_doc):
 def parse_many(html_docs):
     parsed_songs = []
     for html_doc in html_docs:
+        print ('.', end='')
         try:
             parsed_song = parse_song(html_doc)
             parsed_songs.append(parsed_song)
@@ -133,9 +126,11 @@ def parse_many(html_docs):
     return parsed_songs
 
 
-def main():
-    parse_many(html_docs[:12])
-
-
 if __name__ == "__main__":
-    main()
+
+    mc = pymongo.MongoClient()
+    db = mc['chordify']
+    raw_html = db['raw_html']
+    html_docs = list(raw_html.find())
+
+    parse_many(html_docs[:12])

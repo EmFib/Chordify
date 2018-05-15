@@ -1,0 +1,66 @@
+from selenium.webdriver import Chrome
+from bs4 import BeautifulSoup
+import pymongo
+import datetime
+import time
+import pandas as pd
+import numpy as np
+import re
+import warnings
+from sklearn.naive_bayes import BernoulliNB, MultinomialNB
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+import string
+from parse import *
+
+
+tfidf = TfidfVectorizer()
+logistic = LogisticRegression()
+
+
+mc = pymongo.MongoClient()
+db = mc['chordify']
+raw_html = db['raw_html']
+
+html_docs = list(raw_html.find())
+
+parsed_songs = parse_many(html_docs[:4000])
+
+
+def get_all_lyrics_chords(song):
+    song_lyrics = ' '.join(song[1])
+    song_chords = []
+    for ch_tup in song[0]:
+        song_chords.append(ch_tup[1])
+    return (song_lyrics, song_chords)
+
+
+def make_song_dicts(parsed_songs):
+    song_dict_list = []
+    for song in parsed_songs:
+        song_dict  = {}
+        song_dict['lyrics'] = get_all_lyrics_chords(song)[0]
+        song_dict['chords'] = get_all_lyrics_chords(song)[1]
+        song_dict_list.append(song_dict)
+    return song_dict_list
+
+
+def make_song_mats(song_dict_list):
+    contains_minor_mat = []
+    lyrics_mat = []
+    for song_dict in song_dict_list:
+        contains_minor_mat.append(any('m' in chord for chord in song_dict['chords']))
+        lyrics_mat.append(song_dict['lyrics'])
+    return lyrics_mat, contain_minor_mat
+
+
+lyrics_train, chords_train, lyrics_test, chords_test = train_test_split(lyrics_mat, contains_minor_mat)
+
+
+tfidf.fit(lyrics_train)
+train_matrix = tfidf.transform(lyrics_train)
+logistic.fit(lyrics_train, contains_minor_train)
+
+test_matrix = tfidf.transform(lyrics_test)
+logistic.predict_proba(lyrics_test)
