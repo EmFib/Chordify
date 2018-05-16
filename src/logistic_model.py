@@ -56,9 +56,9 @@ if __name__ == "__main__":
 
     song_dict_list = make_song_dicts(parsed_songs)
     lyrics_list, contains_minor_list = make_lists(song_dict_list)
-    df = make_df(lyrics_list, contains_minor_list)
+    df_logi_song = make_df(lyrics_list, contains_minor_list)
 
-    lyrics_train, lyrics_test, contains_minor_train, contains_minor_test = train_test_split(df['lyrics'], df['contains_minor'])
+    lyrics_train, lyrics_test, contains_minor_train, contains_minor_test = train_test_split(df_logi_song['lyrics'], df_logi_song['contains_minor'])
 
     tfidf.fit(lyrics_train)
     train_matrix = tfidf.transform(lyrics_train)
