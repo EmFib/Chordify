@@ -10,28 +10,20 @@ from sklearn.model_selection import train_test_split
 
 def get_phrase_for_chord(one_parsed_song):
     word_list = one_parsed_song['words']
-    chord_phrase_tups = []
+    chord_phrase_tuples = []
     for chord_set in one_parsed_song['chord_idxs']:
         word_idx = chord_set[0]
         chord_name = chord_set[1]
         phrase = ' '.join(word_list[(word_idx - 8):(word_idx + 3)])
-        chord_phrase_tups.append((chord_name, phrase))
-    return chord_phrase_tups
+        chord_phrase_tuples.append((chord_name, phrase))
+    return chord_phrase_tuples
 
-
-def get_list_of_chords(chord_phrase_tuples):
-    phrases = []
-    chords = []
-    is_A = []
-    is_C = []
-    is_D = []
-    is_G = []
-    for chord_phrase_tup in chord_phrase_tuples:
-        phrases.append(chord_phrase_tup[1])
-        chords.append(chord_phrase_tup[0])
-        if chord_phrase_tup[0] == A:
-            is_A.append(chord_phrase_tup[0] == A)
-        elif ....
+def get_all_phrase_chord_tuples(parsed_songs):
+    all_chord_phrase_tuples = []
+    for song in parsed_songs:
+        chord_phrase_tuples = get_phrase_for_chord(song)
+        all_chord_phrase_tuples.extend(chord_phrase_tuples)
+    return all_chord_phrase_tuples
 
 
 def make_phrase_is_minor_list(chord_phrase_tuples):
@@ -44,24 +36,43 @@ def make_phrase_is_minor_list(chord_phrase_tuples):
         is_minor.append('m' in chord_phrase_tup[0])
     return phrases, chords, is_minor
 
+def get_list_of_chords(chord_phrase_tuples):
+    is_A = []
+    is_C = []
+    is_D = []
+    is_G = []
+    other_chord = []
+    for tup in chord_phrase_tuples:
+        is_A.append(tup[0] == 'A')
+        is_C.append(tup[0] == 'C')
+        is_D.append(tup[0] == 'D')
+        is_G.append(tup[0] == 'G')
+        other_chord.append(tup[0] != 'A' and tup[0] != 'C' and tup[0] != 'D' and tup[0] != 'G')
+    return is_A, is_C, is_D, is_G, other_chord
 
-def get_full_phrase_is_minor_list(parsed_songs):
-    phrases_all = []
-    chords_all = []
-    is_minor_all = []
-    for song in parsed_songs:
-        chord_phrase_tups = get_phrase_for_chord(song)
-        phrases, chords, is_minor = make_phrase_is_minor_list(chord_phrase_tups)
-        phrases_all.extend(phrases)
-        chords_all.extend(chords)
-        is_minor_all.extend(is_minor)
-    return phrases_all, chords_all, is_minor_all
 
-def make_phrase_chord_df(phrases_all, chords_all, is_minor_all):
+# def get_full_phrase_is_minor_list(parsed_songs):
+#     phrases_all = []
+#     chords_all = []
+#     is_minor_all = []
+#     for song in parsed_songs:
+#         chord_phrase_tups = get_phrase_for_chord(song)
+#         phrases, chords, is_minor = make_phrase_is_minor_list(chord_phrase_tups)
+#         phrases_all.extend(phrases)
+#         chords_all.extend(chords)
+#         is_minor_all.extend(is_minor)
+#     return phrases_all, chords_all, is_minor_all
+
+def make_phrase_chord_df(phrases, chords, is_minor, is_A, is_C, is_D, is_G, other_chord):
     df = pd.DataFrame({
-        'is_minor': is_minor_all,
-        'chords': chords_all,
-        'words': phrases_all
+        'chords': chords,
+        'A': is_A,
+        'C': is_C,
+        'D': is_D,
+        'G': is_G,
+        'other_chord': other_chord
+        'is_minor': is_minor,
+        'words': phrases
     })
     return df
 
