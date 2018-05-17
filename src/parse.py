@@ -136,7 +136,7 @@ if __name__ == "__main__":
     parsed_songs = parse_many(html_docs[:300])
 
     parsed_songs_db = db["parsed_songs"]
-    
+
     for song in parsed_songs:
         song_dict = {
             "chord_idxs": song[0],
