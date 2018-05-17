@@ -131,6 +131,15 @@ if __name__ == "__main__":
     mc = pymongo.MongoClient()
     db = mc['chordify']
     raw_html = db['raw_html']
-    html_docs = list(raw_html.find())
+    html_docs = list(raw_html.find(limit=4000))
 
-    parse_many(html_docs[:12])
+    parsed_songs = parse_many(html_docs[:350])
+
+    parsed_songs_db = db["parsed_songs"]
+
+    for song in parsed_songs:
+        song_dict = {
+            "chord_idxs": song[0],
+            "words": song[1]
+        }
+        parsed_songs_db.update(song_dict, song_dict, upsert=True)
