@@ -131,9 +131,9 @@ if __name__ == "__main__":
     mc = pymongo.MongoClient()
     db = mc['chordify']
     raw_html = db['raw_html']
-    html_docs = list(raw_html.find(limit=4000))
+    html_docs = list(raw_html.find())
 
-    parsed_songs = parse_many(html_docs[:350])
+    parsed_songs = parse_many(html_docs[:6000])
 
     parsed_songs_db = db["parsed_songs"]
 

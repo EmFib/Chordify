@@ -10,13 +10,13 @@ from sklearn.model_selection import train_test_split
 
 def get_phrase_for_chord(one_parsed_song):
     word_list = one_parsed_song['words']
-    chord_phrase_tups = []
+    chord_phrase_tuples = []
     for chord_set in one_parsed_song['chord_idxs']:
         word_idx = chord_set[0]
         chord_name = chord_set[1]
         phrase = ' '.join(word_list[(word_idx - 8):(word_idx + 3)])
-        chord_phrase_tups.append((chord_name, phrase))
-    return chord_phrase_tups
+        chord_phrase_tuples.append((chord_name, phrase))
+    return chord_phrase_tuples
 
 
 def make_phrase_is_minor_list(chord_phrase_tuples):
