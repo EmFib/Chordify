@@ -11,6 +11,7 @@ from sklearn.model_selection import train_test_split
 
 import src.logistic_by_line
 
+
 class LogisticLyricAnalyzer:
 
     def __init__(self, tfidf, logistic):
@@ -18,12 +19,12 @@ class LogisticLyricAnalyzer:
         self.tfidf = tfidf
         self.logistic = logistic
 
-    def predict(self, words):
+    def predict(self, entry):
 
-        self.words = words
-        self.tfidf.fit(words)
+        entry = input("Please enter some words (minimum 10): ")
+
+        words = [entry]
+        print (words)
         X = self.tfidf.transform(words)
-
         is_minor_pred = self.logistic.predict_proba(X)
-
         return is_minor_pred
