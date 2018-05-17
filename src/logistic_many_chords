@@ -19,7 +19,7 @@ def get_phrase_for_chord(one_parsed_song):
     return chord_phrase_tuples
 
 
-def get_list_of_chords(chord_phrase_tups):
+def get_list_of_chords(chord_phrase_tuples):
     phrases = []
     chords = []
     is_A = []

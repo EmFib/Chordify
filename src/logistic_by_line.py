@@ -62,7 +62,7 @@ if __name__ == "__main__":
     logistic = LogisticRegression()
 
     phrases_all, chords_all, is_minor_all = get_full_phrase_is_minor_list(parsed_songs)
-
+    
     df_by_line = make_phrase_chord_df(phrases_all, chords_all, is_minor_all)
 
 
