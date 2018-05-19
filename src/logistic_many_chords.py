@@ -133,6 +133,6 @@ if __name__ == "__main__":
     tfidf = TfidfVectorizer()
     logistic = LogisticRegression()
 
-    tr, te = train_test_split(list(set(df_chords['song_id'])
+    tr, te = train_test_split(list(set(df_chords['song_id'])))
     df_train = df_chords[df_chords.song_id.isin(tr)]
     df_test = df_chords[df_chords.song_id.isin(te)]
