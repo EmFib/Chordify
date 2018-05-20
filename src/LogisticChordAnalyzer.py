@@ -8,15 +8,20 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 
 
-from src.logistic_many_chords import *
+from logistic_many_chords import *
+
+tfidf = TfidfVectorizer()
+logistic = LogisticRegression()
 
 chord_list = ['A','B','C','D','E','F','G','A7','D7','Em','Am','Bm','Dm','Bb']
 
+chord_model_dict = {}
 
 class LogisticChordAnalyzer:
 
     def __init__(self, tfidf, logistic, chord_list, chord_model_dict, chord_prob_dict):
 
+        self = self
         self.tfidf = tfidf
         self.logistic = logistic
         self.chord_list = chord_list
@@ -54,6 +59,11 @@ class LogisticChordAnalyzer:
         return best_chord
 
 if __name__ == "__main__":
+
+    tfidf = TfidfVectorizer()
+    logistic = LogisticRegression()
+
+    import logistic_many_chords
 
     logistic.fit(df_train)
     logistic.predict(some_words)
