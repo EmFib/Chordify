@@ -24,6 +24,7 @@ class LogisticChordAnalyzer:
 
     def fit(self, df_train):
         self.tfidf = TfidfVectorizer()
+        # self.logistic = LogisticRegression()
         X_train = df_train['words']
         self.tfidf.fit(X_train)
         for chord in chord_list:
@@ -51,11 +52,12 @@ def fit_lca():
     return lca
 
 
-def get_ten_words():
+def get_words_and_lines():
     while True:
-        entry = input("Please enter 10-25 words: ")
-        # if 10 <= len(entry.split()) <=25:
-        return entry
+        entry = input("Please enter your words (minimum 7): ")
+        if 7 <= len(entry.split()):
+            lines = re.split('[?.,!-]', entry)
+            return lines
 
 
 def save_lca():
@@ -72,12 +74,12 @@ def load_lca():
 
 def main():
     lca = load_lca()
-    some_words = get_ten_words()
+    lines = get_words_and_lines()
+    for line in lines:
+        if len(line) >= 2:
+            best_line_chord = lca.predict(line)
+            print ("{}:".format(line), best_line_chord)
 
-    chord_list = []
-    for phrase in re.split('[?.,!]', some_words):
-        best_phrase_chord = lca.predict(phrase)
-        print (phrase, best_phrase_chord)
 
     # *******
     # best_chord = lca.predict(some_words)
