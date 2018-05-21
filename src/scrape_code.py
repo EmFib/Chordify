@@ -13,9 +13,10 @@ raw_html = db['raw_html']
 browser = Chrome()
 
 # https://www.ultimate-guitar.com/explore?decade[]=1980&order=hitstotal_desc&page=2&type[]=Chords
+# https://www.ultimate-guitar.com/explore?capo[]=0&page=2&part[]=&tuning[]=1&type[]=Chords
 
-base_url = 'https://www.ultimate-guitar.com/explore?decade[]=1980&order=hitstotal_desc&page='
-base_url_2 = '&type[]=Chords'
+base_url = 'https://www.ultimate-guitar.com/explore?capo[]=0&page='
+base_url_2 = '&part[]=&tuning[]=1&type[]=Chords'
 
 # artist_url =  'https://www.ultimate-guitar.com/artist/m_ward_9961?filter=chords'
 

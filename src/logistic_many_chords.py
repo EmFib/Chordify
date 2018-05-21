@@ -85,7 +85,7 @@ def get_list_of_chords(chord_phrase_tuples):
         is_Bm.append(tup[0] == 'Bm')
         is_Dm.append(tup[0] == 'Dm')
         is_Bb.append(tup[0] == 'Bb')
-        other_chord.append(tup[0] not in good_chords)
+        other_chord.append(tup[0] not in chord_list)
     return is_A, is_B, is_C, is_D, is_E, is_F, is_G, is_A7, is_D7, is_Em, is_Am, is_Bm, is_Bb, is_Dm, other_chord
 
 
@@ -119,13 +119,14 @@ def make_phrase_chord_df(chord_phrase_tuples):
 
     return df
 
-if __name__ == "__main__":
+def get_data():
+
 
     mc = pymongo.MongoClient()
     db = mc['chordify']
 
     parsed_songs_db = db["parsed_songs"]
-    parsed_songs = list(parsed_songs_db.find())[25:75]
+    parsed_songs = list(parsed_songs_db.find())
 
     chord_phrase_tuples = get_all_phrase_chord_tuples(parsed_songs)
     df_chords = make_phrase_chord_df(chord_phrase_tuples)
@@ -136,3 +137,5 @@ if __name__ == "__main__":
     tr, te = train_test_split(list(set(df_chords['song_id'])))
     df_train = df_chords[df_chords.song_id.isin(tr)]
     df_test = df_chords[df_chords.song_id.isin(te)]
+
+    return df_train, df_test

@@ -133,7 +133,7 @@ if __name__ == "__main__":
     raw_html = db['raw_html']
     html_docs = list(raw_html.find())
 
-    parsed_songs = parse_many(html_docs[:6000])
+    parsed_songs = parse_many(html_docs[:7000])
 
     parsed_songs_db = db["parsed_songs"]
 
