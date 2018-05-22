@@ -4,7 +4,9 @@ import pymongo
 import datetime
 import time
 import random
+import boto3
 
+s3 = boto3.client('s3')
 
 mc = pymongo.MongoClient()
 db = mc['chordify']
@@ -12,15 +14,15 @@ raw_html = db['raw_html']
 
 browser = Chrome()
 
+
 # https://www.ultimate-guitar.com/explore?capo[]=0&genres[]=666&page=2&part[]=&tuning[]=1&type[]=Chords
+# https://www.ultimate-guitar.com/explore?decade[]=1990&order=hitstotal_desc&page=2&type[]=Chords
 
-base_url = 'https://www.ultimate-guitar.com/explore?capo[]=0&genres[]=666&page='
-base_url_2 = '&part[]=&tuning[]=1&type[]=Chords'
+base_url = 'https://www.ultimate-guitar.com/explore?decade[]=1990&order=hitstotal_desc&page='
+base_url_2 = '&type[]=Chords'
 
-# artist_url =  'https://www.ultimate-guitar.com/artist/m_ward_9961?filter=chords'
-
-def make_urls(base_url, base_url_2, n=10):
-    '''get list of page urls for given artist'''
+def make_urls(base_url, base_url_2, n=15):
+    '''get list of urls for given artist or genre'''
     artist_urls = []
     for num in range(1, n+1):
         artist_urls.append(base_url + str(num) + base_url_2)
@@ -35,7 +37,7 @@ def get_all_urls(artist_urls):
 
 
 def get_song_urls(artist_url):
-    '''get urls to song pages'''
+    '''returns urls to song pages'''
     print (artist_url)
     browser.get(artist_url)
     time.sleep(5)
@@ -62,12 +64,15 @@ def scrape_song_page(song_url, retrieve_from_cache=True):
 
 
 def retrieve_song(song_url):
+    '''to avoid duplicates,
+    looks for the html in the collection'''
     result = raw_html.find_one({'url': song_url})
     return result
 
 
 def scrape_songs(song_urls):
-    '''scrape each song link into MongoDB'''
+    '''puts each song html into MongoDB collection
+    (if not a duplicate)'''
 
     for song_url in song_urls:
         print (song_url)
@@ -81,7 +86,7 @@ def scrape_songs(song_urls):
 
 
 def main():
-    artist_urls = make_urls(base_url, base_url_2, n=10)
+    artist_urls = make_urls(base_url, base_url_2, n=15)
     song_urls = get_all_urls(artist_urls)
     # song_urls = get_song_urls(artist_url)
     scrape_songs(song_urls)

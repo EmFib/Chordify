@@ -1,4 +1,3 @@
-# from selenium.webdriver import Chrome
 from bs4 import BeautifulSoup
 import pymongo
 import datetime
@@ -9,6 +8,9 @@ import warnings
 
 
 def get_lines_from_song(html_doc):
+    '''
+    From raw html for one song, finds & returns portion that is actual body of song and splits into lines
+    '''
     if 'html' in html_doc:
         html = html_doc['html']
     elif 'song_html' in html_doc:
@@ -22,6 +24,9 @@ def get_lines_from_song(html_doc):
 
 
 def strip_html(text):
+    '''
+    Removes < and > from the html lines
+    '''
     result = []
     in_tag = False
     for char in text:
@@ -35,6 +40,9 @@ def strip_html(text):
 
 
 def separate_lines(html_doc):
+    '''
+    Separates chords and words; returns list of dictionaries for the song; each dictionary has 'chords' and 'words' as keys.
+    '''
     song_lines = get_lines_from_song(html_doc)
     lines = []
     for i, song_line in enumerate(song_lines):
@@ -46,6 +54,12 @@ def separate_lines(html_doc):
 
 
 def get_chords(line):
+    '''
+    For single line of song, returns:
+        chord_idxs: list of character index at which each chord appears
+        chords: lists of chords
+        chord_tups: list of tuples matching above two results
+    '''
     chord_idxs = []
     chords = []
     c_string = line['chords']
@@ -57,6 +71,12 @@ def get_chords(line):
 
 
 def get_words(line):
+    '''
+    For single line of song, returns:
+        word_idxs: list of character index at which each word appears (index of the first character of the word)
+        words: lists of words in line
+        word_tups: list of tuples matching above two results
+    '''
     word_idxs = []
     words = []
     if 'words'in line:
@@ -69,6 +89,11 @@ def get_words(line):
 
 
 def merge_chord_word(line):
+    '''
+    For given line of song, returns tuple of two lists:
+    - chord_idx_list: chords and the index of word it is closest to (matching the index of the word in the word_list)
+    - word_list
+    '''
     chord_tups = get_chords(line)[2]
     word_tups = get_words(line)[2]
     word_list = get_words(line)[1]
@@ -82,6 +107,9 @@ def merge_chord_word(line):
 
 
 def combine_ch_wd_lists(merged_line_1, merged_line_2):
+    '''
+    stacks two chord-idx and word lists on top of each other with appropriate indices
+    '''
     chord_idx_list_1, word_list_1 = merged_line_1
     chord_idx_list_2, word_list_2 = merged_line_2
     new_chord_tups = []
@@ -93,6 +121,9 @@ def combine_ch_wd_lists(merged_line_1, merged_line_2):
 
 
 def parse_lines(lines):
+    '''
+    Makes chord_idx_list and word_list for entire song
+    '''
     if len(lines) == 0:
         raise ValueError("Bad song.")
     for i, line in enumerate(lines):
@@ -105,12 +136,19 @@ def parse_lines(lines):
 
 
 def parse_song(html_doc):
+    '''
+    parses song into chord-idx and word lists from html_doc
+    '''
     lines = separate_lines(html_doc)
     parsed_song = parse_lines(lines)
     return parsed_song
 
 
 def parse_many(html_docs):
+    '''
+    Parses list of songs into chord-idx and word lists from html_docs
+    Returns list of parsed songs 
+    '''
     parsed_songs = []
     for html_doc in html_docs:
         print ('.', end='')

@@ -17,11 +17,14 @@ chord_list = ['A','B','C','D','E','F','G','A7','D7','Em','Am','Bm','Dm','Bb']
 
 
 class LogisticChordAnalyzer:
-
+    '''
+    Fits logistic regression model for each chord and gives most probably chord for user-inputted words.
+    '''
     def __init__(self):
         self.chord_list = chord_list
         self.chord_model_dict = {}
 
+    # fits logistic regression model for each chord in chord list and puts into dictionary
     def fit(self, df_train):
         self.tfidf = TfidfVectorizer()
         # self.logistic = LogisticRegression()
@@ -34,6 +37,7 @@ class LogisticChordAnalyzer:
             logistic.fit(tr_matrix, y_train)
             self.chord_model_dict[chord] = logistic
 
+    # Takes user-input words and runs logistic regression for each chord in chord list. Puts predict_proba into diciontary; Returns chord and predict_proba for chord with highest probability.
     def predict(self, some_words):
         words = [some_words]
         X = self.tfidf.transform(words)
@@ -46,6 +50,9 @@ class LogisticChordAnalyzer:
 
 
 def fit_lca():
+    '''
+    Fits the LogisticChordAnalyzer on the entrie set of training data.
+    '''
     df_train, df_test = logistic_many_chords.get_data()
     lca = LogisticChordAnalyzer()
     lca.fit(df_train)
@@ -53,20 +60,29 @@ def fit_lca():
 
 
 def get_words_and_lines():
+    '''
+    Gets words as user input and splits into lines by punctuation.
+    '''
     while True:
-        entry = input("Please enter your words (minimum 7): ")
-        if 7 <= len(entry.split()):
+        entry = input("Please enter your favorite words: ")
+        if 3 <= len(entry.split()):
             lines = re.split('[?.,!-]', entry)
             return lines
 
 
 def save_lca():
+    '''
+    Pickles trained logistic model so can be accessed more quickly.
+    '''
     lca = fit_lca()
     with open('lca.pkl', 'wb') as f:
         pickle.dump(lca, f)
 
 
 def load_lca():
+    '''
+    Retrieves trained logistic model.
+    '''
     with open ('lca.pkl', 'rb') as f:
         lca = pickle.load(f)
     return lca
