@@ -45,7 +45,7 @@ class LogisticChordAnalyzer:
         for chord in chord_list:
             chord_prob_dict[chord] = self.chord_model_dict[chord].predict_proba(X)[0][1]
         best_chord = max(chord_prob_dict.items(), key=lambda k: k[1])
-        # print (chord_prob_dict)
+        print (chord_prob_dict)
         return best_chord
 
 
@@ -86,6 +86,10 @@ def load_lca():
     with open ('lca.pkl', 'rb') as f:
         lca = pickle.load(f)
     return lca
+
+
+def get_score(df_test):
+
 
 
 def main():

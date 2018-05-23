@@ -8,22 +8,17 @@ import boto3
 
 s3 = boto3.client('s3')
 
-mc = pymongo.MongoClient()
-db = mc['chordify']
-raw_html = db['raw_html']
-
 browser = Chrome()
 
 
 # https://www.ultimate-guitar.com/explore?capo[]=0&genres[]=666&page=2&part[]=&tuning[]=1&type[]=Chords
 # https://www.ultimate-guitar.com/explore?decade[]=1990&order=hitstotal_desc&page=2&type[]=Chords
-
-# https://www.ultimate-guitar.com/explore?order=rating_desc&page=2&type[]=Chords
-
-base_url = 'https://www.ultimate-guitar.com/explore?order=rating_desc&page='
+base_url = 'https://www.ultimate-guitar.com/explore?decade[]=1990&order=hitstotal_desc&page='
 base_url_2 = '&type[]=Chords'
 
-def make_urls(base_url, base_url_2, n=500):
+# artist_url =  'https://www.ultimate-guitar.com/artist/m_ward_9961?filter=chords'
+
+def make_urls(base_url, base_url_2, n=10):
     '''get list of urls for given artist or genre'''
     artist_urls = []
     for num in range(1, n+1):
@@ -79,16 +74,13 @@ def scrape_songs(song_urls):
     for song_url in song_urls:
         print (song_url)
         html = scrape_song_page(song_url)
-        if retrieve_song(song_url) is None:
-            raw_html.insert_one (
-                {'url': song_url,
-                 'datetime': datetime.datetime.now(),
-                 'html': html
-                })
+        s3.put_object(Bucket = 'chordify_html', Key='')
+
+
 
 
 def main():
-    artist_urls = make_urls(base_url, base_url_2, n=500)
+    artist_urls = make_urls(base_url, base_url_2, n=10)
     song_urls = get_all_urls(artist_urls)
     # song_urls = get_song_urls(artist_url)
     scrape_songs(song_urls)
