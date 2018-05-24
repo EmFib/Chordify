@@ -147,7 +147,7 @@ def parse_song(html_doc):
 def parse_many(html_docs):
     '''
     Parses list of songs into chord-idx and word lists from html_docs
-    Returns list of parsed songs 
+    Returns list of parsed songs
     '''
     parsed_songs = []
     for html_doc in html_docs:
@@ -171,7 +171,7 @@ if __name__ == "__main__":
     raw_html = db['raw_html']
     html_docs = list(raw_html.find())
 
-    parsed_songs = parse_many(html_docs[:7000])
+    parsed_songs = parse_many(html_docs)
 
     parsed_songs_db = db["parsed_songs"]
 
