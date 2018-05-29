@@ -9,10 +9,12 @@ from sklearn.model_selection import train_test_split
 
 
 def get_phrase_for_chord(one_parsed_song):
-
+    '''
+    Takes: parsed song as stored in MongoDB collection.
+    Returns: a tuple for every chord change in the song. Tuple contains the chord, a phrase (string of words) representing the 7 words before and 3 words after the chord change, and the song id.
+    '''
     song_id = str(one_parsed_song['_id'])
     word_list = one_parsed_song['words']
-
     one_song_chord_phrase_tuples = []
 
     for chord_set in one_parsed_song['chord_idxs']:
@@ -25,7 +27,9 @@ def get_phrase_for_chord(one_parsed_song):
 
 
 def get_all_phrase_chord_tuples(parsed_songs):
-
+    '''
+    Returns chord-phrase-song id tuples for every song in parsed songs.
+    '''
     chord_phrase_tuples = []
 
     for song in parsed_songs:
@@ -36,7 +40,9 @@ def get_all_phrase_chord_tuples(parsed_songs):
 
 
 def make_phrase_is_minor_list(chord_phrase_tuples):
-
+    '''
+    Creates lists of phrases, actual chords, whether chord is minor, and song id for song containing phrase. (All lists equal length.)
+    '''
     phrases = []
     chords = []
     is_minor = []
@@ -51,10 +57,12 @@ def make_phrase_is_minor_list(chord_phrase_tuples):
     return phrases, chords, is_minor, song_ids
 
 
-
 chord_list = ['A','B','C','D','E','F','G','G#','A7','D7','Em','Am','Bm','Dm','Bb']
 
 def get_list_of_chords(chord_phrase_tuples):
+    '''
+    Each list represent a boolean identification for each chord in list of tuples -- True if the chord is said chord, False if not.
+    '''
     is_A = []
     is_B = []
     is_C = []
@@ -85,12 +93,19 @@ def get_list_of_chords(chord_phrase_tuples):
         is_Bm.append(tup[0] == 'Bm')
         is_Dm.append(tup[0] == 'Dm')
         is_Bb.append(tup[0] == 'Bb')
-        other_chord.append(tup[0] not in good_chords)
+        other_chord.append(tup[0] not in chord_list)
     return is_A, is_B, is_C, is_D, is_E, is_F, is_G, is_A7, is_D7, is_Em, is_Am, is_Bm, is_Bb, is_Dm, other_chord
 
 
 def make_phrase_chord_df(chord_phrase_tuples):
+    '''
+    Creates dataframe with a row for every chord change in the songs provided. Has the following columns:
+    - chord: chord entry for every chord change
+    - words: words surroung chord change
+    - song_id: id for song containing chord change + words
+    - column for each chord: boolean indicating whether the chord change is that chord
 
+    '''
     phrases, chords, is_minor, song_ids = make_phrase_is_minor_list(chord_phrase_tuples)
 
     is_A, is_B, is_C, is_D, is_E, is_F, is_G, is_A7, is_D7, is_Em, is_Am, is_Bm, is_Bb, is_Dm, other_chord = get_list_of_chords(chord_phrase_tuples)
@@ -119,20 +134,28 @@ def make_phrase_chord_df(chord_phrase_tuples):
 
     return df
 
-if __name__ == "__main__":
+def get_data():
 
+    # identify and initialize MongoDB database
     mc = pymongo.MongoClient()
     db = mc['chordify']
 
+    # identify MongoDB collection
     parsed_songs_db = db["parsed_songs"]
-    parsed_songs = list(parsed_songs_db.find())[25:75]
+    parsed_songs = list(parsed_songs_db.find())
 
-    chord_phrase_tuples = get_all_phrase_chord_tuples(parsed_songs)
-    df_chords = make_phrase_chord_df(chord_phrase_tuples)
-
+    # create aliases for models
     tfidf = TfidfVectorizer()
     logistic = LogisticRegression()
 
-    tr, te = train_test_split(list(set(df_chords['song_id'])
+    # call functions to build chord-phrase associations and turn into dataframe
+    chord_phrase_tuples = get_all_phrase_chord_tuples(parsed_songs)
+    df_chords = make_phrase_chord_df(chord_phrase_tuples)
+
+    # create train and test dataframes ensuring that lines from same song do not enter both train and test sets
+    tr, te = train_test_split(list(set(df_chords['song_id'])))
     df_train = df_chords[df_chords.song_id.isin(tr)]
     df_test = df_chords[df_chords.song_id.isin(te)]
+
+    # return dataframes for use in other scripts
+    return df_train, df_test
