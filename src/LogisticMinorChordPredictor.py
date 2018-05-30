@@ -12,19 +12,27 @@ from sklearn.model_selection import train_test_split
 import src.logistic_by_line
 
 
-class LogisticLyricAnalyzer:
+
+class LogisticMinorChordPredictor:
 
     def __init__(self, tfidf, logistic):
+
 
         self.tfidf = tfidf
         self.logistic = logistic
 
     def predict(self, entry):
 
-        entry = input("Please enter some words (minimum 10): ")
 
         words = [entry]
         print (words)
         X = self.tfidf.transform(words)
         is_minor_pred = self.logistic.predict_proba(X)
         return is_minor_pred
+
+
+if __name__ == "__main__":
+
+    entry = input("Please enter some words (minimum 10): ")
+
+    model = LogisticMinorChordPredictor(entry)
