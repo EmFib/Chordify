@@ -26,6 +26,10 @@ From there, I built a dictionary of 14 models - one for each of the chords. They
 
 For predictions, user-inputted words are transformed by the Tf-Idf vectorization and then a Logistic Regression predict_proba was ran for each of the models in the chord model dictionary. Chordify's chord prediction was the that which had the highest probability. 
 
+Example of relative probabilities for one line of text: 
+
+
+
 ### Access the project 
 
 After cloning the repo, the following commands can be run in iPython: 
