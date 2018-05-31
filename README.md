@@ -29,7 +29,7 @@ For predictions, user-inputted words are transformed by the Tf-Idf vectorization
 Example of relative probabilities for one line of text:
 
 <!-- ![Feature Importance by Category](images/relative_chord_probabilities_slide.png) -->
-<img src="images/relative_chord_probabilities_slide.png" width="600"/>
+<img align="center" src="images/relative_chord_probabilities_slide.png" width="600"/>
 
 ### Access the project
 
