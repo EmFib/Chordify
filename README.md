@@ -31,6 +31,20 @@ Example of relative probabilities for one line of text:
 <!-- ![Feature Importance by Category](images/relative_chord_probabilities_slide.png) -->
 <img align="center" src="images/relative_chord_probabilities_slide.png" width="600"/>
 
+### Results 
+
+I tested Chordify's chord predictions against actual chords shown on guitar sheet music for several songs. Below are sample results for Fleetwood Mac's "Landslide." The column in the middle represents Chordify's chord predictions while the far-right columns represents the chords on the sheet music. Highlighted in green are lines of lyrics where Chordify's prediction was accurate to the sheet music. 
+
+<!-- ![Feature Importance by Category](images/landslide.png) -->
+<img align="center" src="images/landslide.png" width="600"/>
+
+The purpose of Chordify, however, is not to predict chords for songs that have already been written but to suggest chords based on words that are not yet set to music. I experimented with my favorite poem, Mary Oliver's _Wild Geese_. 
+
+Note below how "love what it loves" is predicted to be a B minor. One interesting discovery thoughout my use cases was that Chordify linked the uncommon Bm chord to phrases including the word "love," which suggests that there is a prepondence of songs in the training dataset that associated Bm to the word. 
+
+<!-- ![Feature Importance by Category](images/wild_geese.png) -->
+<img align="center" src="images/wild_geese.png" width="600"/>
+
 ### Access the project
 
 After cloning the repo, the following commands can be run in iPython:
