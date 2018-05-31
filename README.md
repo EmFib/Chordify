@@ -16,7 +16,7 @@ Chordify is a user interface that allows songwriters to input English words and 
 
 ### Data scraping and parsing
 
-8,000 songs were scraped from https://www.ultimate-guitar.com/ and parsed into separate lines of words and chords, with each chord matched to the word it landed on via character indexing. From there, I pulled out the 10 words that surrounded the chord (seven before and three after) and made chord-word association for each of those 10 words.  
+8,000 songs were scraped from [Ultimate-Guitar.com](https://www.ultimate-guitar.com/) and parsed into separate lines of words and chords, with each chord matched to the word it landed on via character indexing. From there, I pulled out the 10 words that surrounded the chord (seven before and three after) and made chord-word association for each of those 10 words.  
 
 ### Modeling
 
