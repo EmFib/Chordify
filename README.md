@@ -28,7 +28,7 @@ For predictions, user-inputted words are transformed by the Tf-Idf vectorization
 
 Example of relative probabilities for one line of text:
 
-![relative_chord_prob_slide](Chordify/presentation/Chordify_Presentation.pdf)
+![relative_chord_prob_slide](images/relative_chord_probabilities_slide.png)
 
 ### Access the project
 
