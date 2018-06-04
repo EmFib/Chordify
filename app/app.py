@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 @app.route('/', methods=['GET'])
 def index():
-    return render_template('quadratic.html')
+    return render_template('chordify.html')
 
 
 @app.route('/solve', methods=['POST'])
