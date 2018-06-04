@@ -16,7 +16,7 @@ Chordify is a user interface that allows songwriters to input English words and 
 
 ### Data scraping and parsing
 
-8,000 songs were scraped from https://www.ultimate-guitar.com/ and parsed into separate lines of words and chords, with each chord matched to the word it landed on via character indexing. From there, I pulled out the 10 words that surrounded the chord (seven before and three after) and made chord-word association for each of those 10 words.  
+8,000 songs were scraped from [Ultimate-Guitar.com](https://www.ultimate-guitar.com/) and parsed into separate lines of words and chords, with each chord matched to the word it landed on via character indexing. From there, I pulled out the 10 words that surrounded the chord (seven before and three after) and made chord-word association for each of those 10 words.  
 
 ### Modeling
 
@@ -28,7 +28,22 @@ For predictions, user-inputted words are transformed by the Tf-Idf vectorization
 
 Example of relative probabilities for one line of text:
 
-![relative_chord_prob_slide](Chordify/presentation/Chordify_Presentation.pdf)
+<!-- ![Feature Importance by Category](images/relative_chord_probabilities_slide.png) -->
+<img align="center" src="images/relative_chord_probabilities_slide.png" width="600"/>
+
+### Results 
+
+I tested Chordify's chord predictions against actual chords shown on guitar sheet music for several songs. Below are sample results for Fleetwood Mac's "Landslide." The column in the middle represents Chordify's chord predictions while the far-right columns represents the chords on the sheet music. Highlighted in green are lines of lyrics where Chordify's prediction was accurate to the sheet music. 
+
+<!-- ![Feature Importance by Category](images/landslide.png) -->
+<img align="center" src="images/landslide.png" width="600"/>
+
+The purpose of Chordify, however, is not to predict chords for songs that have already been written but to suggest chords based on words that are not yet set to music. I experimented with my favorite poem, Mary Oliver's _Wild Geese_. 
+
+Note below how "love what it loves" is predicted to be a B minor. One interesting discovery thoughout my use cases was that Chordify linked the uncommon Bm chord to phrases including the word "love," which suggests that there is a prepondence of songs in the training dataset that associated Bm to the word. 
+
+<!-- ![Feature Importance by Category](images/wild_geese.png) -->
+<img align="center" src="images/wild_geese.png" width="600"/>
 
 ### Access the project
 
