@@ -2,7 +2,13 @@ from __future__ import division
 from math import sqrt
 from flask import Flask, render_template, request, jsonify
 
+import re 
+
 from ..LogisticChordAnalyzer import fit_lca, save_lca, load_lca, LogisticChordAnalyzer
+
+# from /Users.emilynaftalin.Data_Science.Galvanize.dsi.Chordify.chordify.LogisticChordAnalyzer import fit_lca, save_lca, load_lca, LogisticChordAnalyzer
+
+## to run: python -m chordify.app.app (out ouf Chordify directory)
 
 app = Flask(__name__)
 
@@ -30,24 +36,27 @@ def index():
 @app.route('/solve', methods=['POST'])
 
 def solve():
+    print("solving...")
     user_data = request.json
     entry = user_data['words']
     lines = _submit_words(entry)
     _chord_preds = _get_chords(lines)
+    root_1 = print_prediction(chord_preds)
+    print(lines)
+    # print(_chord_preds)
     return jsonify({'chord_preds': _chord_preds})
 
-def _submit_words():
+def _submit_words(entry):
     '''
     Gets words as user input and splits into lines by punctuation.
     '''
     while True:
-        entry = user_data['words']
         if 3 <= len(entry.split()):
             lines = re.split('[?.,!-]', entry)
             return lines
 
 
-def _get_chords():
+def _get_chords(lines):
     lca = load_lca()
     lines = _submit_words()
     for line in lines:
